@@ -2,7 +2,7 @@
 Basic starting point for tsapp commands.
 """
 
-import sys
+import sys, os
 
 def error_exit(code, message=""):
     """
@@ -19,7 +19,20 @@ def read_config():
 
     TODO: Get local overrides for things like target server.
     """
-    pass
+    homedir = os.getenv('HOME')
+    config = {}
+    if homedir:
+        try:
+            config_file = open(os.path.join(homedir, '.tsapp'))
+            for line in config_file.readlines():
+                key, value = line.split(':', 1)
+                key = key.rstrip().lstrip()
+                value = value.rstrip().lstrip()
+                if key and value and not key.startswith('#'):
+                    config[key] = value
+        except IOError:
+            pass
+    return config
 
 
 def run_server(args):
@@ -38,12 +51,12 @@ def run_server(args):
     yet proxied. When it is implemented it will only proxy, no
     local handing will be done.
     """
-    read_config()
+    config = read_config()
 
     from wsgiref.simple_server import make_server
-    from tsapp.proxy import app
+    from tsapp.proxy import create_app
 
-    httpd = make_server('', 8080, app)
+    httpd = make_server('', 8080, create_app(config['auth_token']))
 
     print "Serving on http://0.0.0.0:8080/index.html"
 
