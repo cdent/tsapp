@@ -1,0 +1,2 @@
+include Makefile README
+recursive-include tsapp/resources *

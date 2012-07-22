@@ -1,0 +1,5 @@
+
+* create a local app of name X with X.{html,css,js}
+* send those files to the server
+* optionally include various libraires
+* sync back and forth, fixing paths
