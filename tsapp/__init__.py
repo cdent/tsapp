@@ -2,7 +2,9 @@
 Basic starting point for tsapp commands.
 """
 
-import sys, os
+import glob
+import os
+import sys
 
 def error_exit(code, message=""):
     """
@@ -47,9 +49,8 @@ def run_server(args):
     will be looked for in the local dir without failover to the
     remote server.
 
-    At the moment only GET is handled. PUT is recognized, but not
-    yet proxied. When it is implemented it will only proxy, no
-    local handing will be done.
+    GET is handled locally and proxied. Other methods (write)
+    only proxy.
     """
     config = read_config()
 
@@ -58,7 +59,11 @@ def run_server(args):
 
     httpd = make_server('', 8080, create_app(config['auth_token']))
 
-    print "Serving on http://0.0.0.0:8080/index.html"
+    uri = 'http://0.0.0.0:8080/'
+
+    print 'Serving %s' % uri
+    for html in glob.glob('*.html'):
+        print 'Try: %s%s' % (uri, html)
 
     try:
         httpd.serve_forever()
