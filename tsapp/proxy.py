@@ -8,7 +8,10 @@ import urllib2
 
 
 class NoRedirect(urllib2.HTTPRedirectHandler):
-    def redirect_request(self, req, fp, code, msg, hdrs, newurl):
+    """
+    Handler for urllib2 that avoids following redirects.
+    """
+    def redirect_request(self, req, fproxy, code, msg, hdrs, newurl):
         pass
 
 
@@ -69,12 +72,17 @@ def handle_write(environ, start_response, method, config):
         start_response(str(code) + ' error', [])
         return ['%s' % exc]
 
-    start_response('204 OK', [])
+    start_response('204 OK', [('Content-type', mime_type)])
     content = response.read()
     return content
 
 
 def handle_get(environ, start_response, config):
+    """
+    Proxy a GET request. Look in the local dir and the assets
+    dir. If not there try at the target server, at the path
+    requested.
+    """
 
     auth_token = config.get('auth_token')
     target_server = config.get('target_server')
@@ -109,10 +117,18 @@ def handle_get(environ, start_response, config):
 
 
 def in_assets(path):
+    """
+    Open the requested path in the assets directory.
+    If the file is not present, an error will cause
+    a failover to the target server.
+    """
     return open(os.path.join('.', 'assets', path))
 
 
 def at_server(server, path, auth_token):
+    """
+    Filehandle for the resource at the target server.
+    """
     if not path.startswith('/'):
         path = '/%s' % path
     req = urllib2.Request(server + path)

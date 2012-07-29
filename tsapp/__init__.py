@@ -8,6 +8,7 @@ import glob
 import os
 import sys
 
+
 def error_exit(code, message=""):
     """
     Exit with code and provided message.
@@ -27,10 +28,10 @@ def read_config():
     homedir = os.getenv('HOME')
     # defaults
     config = {
-            'target_server': 'http://tiddlyspace.com',
-            'local_host': '0.0.0.0',
-            'port': 8080,
-            }
+        'target_server': 'http://tiddlyspace.com',
+        'local_host': '0.0.0.0',
+        'port': 8080,
+    }
 
     paths = ['.']
     if homedir:
@@ -56,7 +57,7 @@ def run_server(args):
     form /bags/something/tiddlers/filename will look in the local
     dir called "assets" for "filename". If the file is not found, the
     full path will be looked up at tiddlyspace.com.
-    
+
     If the path is a single file or begins with "/" then the file
     will be looked for in the local dir without failover to the
     remote server.
@@ -91,7 +92,7 @@ def new_app(args):
     Create the directory and stub files for a new app.
 
     Which means:
-    
+
     * make a directory
     * put a stub index.html
     * make an assets directory
@@ -117,10 +118,11 @@ def show_help(args):
 
 
 COMMANDS = {
-        'serve': run_server,
-        'init': new_app,
-        'help': show_help
-        }
+    'serve': run_server,
+    'init': new_app,
+    'help': show_help
+}
+
 
 def handle(args):
     """
