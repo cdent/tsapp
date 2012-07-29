@@ -2,6 +2,8 @@
 Basic starting point for tsapp commands.
 """
 
+from __future__ import absolute_import
+
 import glob
 import os
 import sys
@@ -17,15 +19,25 @@ def error_exit(code, message=""):
 
 def read_config():
     """
-    Read the local config to manage options.
-
-    TODO: Get local overrides for things like target server.
+    Read the local config to manage options. There can be
+    a .tsapp file in the local dir or in the users HOME dir.
+    The HOME dir is read first, and then the local file overrides
+    that.
     """
     homedir = os.getenv('HOME')
-    config = {}
+    # defaults
+    config = {
+            'target_server': 'http://tiddlyspace.com',
+            'local_host': '0.0.0.0',
+            'port': 8080,
+            }
+
+    paths = ['.']
     if homedir:
+        paths.insert(0, homedir)
+    for path in paths:
         try:
-            config_file = open(os.path.join(homedir, '.tsapp'))
+            config_file = open(os.path.join(path, '.tsapp'))
             for line in config_file.readlines():
                 key, value = line.split(':', 1)
                 key = key.rstrip().lstrip()
@@ -39,7 +51,7 @@ def read_config():
 
 def run_server(args):
     """
-    Run a wsgi server at :8080 which will look locally for content
+    Run a wsgi server which will look locally for content
     and if not found there, look remotely. A path which takes the
     form /bags/something/tiddlers/filename will look in the local
     dir called "assets" for "filename". If the file is not found, the
@@ -55,11 +67,14 @@ def run_server(args):
     config = read_config()
 
     from wsgiref.simple_server import make_server
-    from tsapp.proxy import create_app
+    from .proxy import create_app
 
-    httpd = make_server('', 8080, create_app(config['auth_token']))
+    port = int(config['port'])
+    local_host = config['local_host']
 
-    uri = 'http://0.0.0.0:8080/'
+    httpd = make_server(local_host, port, create_app(config))
+
+    uri = 'http://%s:%s/' % (local_host, port)
 
     print 'Serving %s' % uri
     for html in glob.glob('*.html'):
@@ -69,6 +84,28 @@ def run_server(args):
         httpd.serve_forever()
     except KeyboardInterrupt:
         sys.exit(0)
+
+
+def new_app(args):
+    """
+    Create the directory and stub files for a new app.
+
+    Which means:
+    
+    * make a directory
+    * put a stub index.html
+    * make an assets directory
+    * local .tsapp
+    """
+    from .instance import make_instance
+
+    target = args[0]
+
+    try:
+        make_instance(target)
+    except Exception, exc:
+        sys.stderr.write('%s\n' % exc)
+        sys.exit(1)
 
 
 def show_help(args):
@@ -81,6 +118,7 @@ def show_help(args):
 
 COMMANDS = {
         'serve': run_server,
+        'init': new_app,
         'help': show_help
         }
 
@@ -92,8 +130,8 @@ def handle(args):
         command = args.pop(0)
         functor = COMMANDS[command]
         functor(args)
-    except IndexError:
-        error_exit(1, "command required")
-    except KeyError:
-        error_exit(1, "command unknown")
+    except IndexError, exc:
+        error_exit(1, 'command required')
+    except KeyError, exc:
+        error_exit(1, 'command unknown: %s' % exc)
     # let others raise themselves, for now

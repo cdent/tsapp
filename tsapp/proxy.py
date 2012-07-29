@@ -25,27 +25,30 @@ class App(object):
     auth token easily.
     """
 
-    def __init__(self, auth_token=None):
-        self.auth_token = auth_token
+    def __init__(self, config):
+        self.config = config
 
     def __call__(self, environ, start_response):
         method = environ['REQUEST_METHOD'].upper()
         if method != 'GET':
-            return handle_write(environ, start_response, method, self.auth_token)
+            return handle_write(environ, start_response, method, self.config)
         else:
-            return handle_get(environ, start_response, self.auth_token)
+            return handle_get(environ, start_response, self.config)
 
 
-def handle_write(environ, start_response, method, auth_token):
+def handle_write(environ, start_response, method, config):
     """
     Handle a POST, PUT or DELETE.
     """
     path = environ['PATH_INFO']
     content_length = environ['CONTENT_LENGTH']
 
+    auth_token = config.get('auth_token')
+    target_server = config.get('target_server')
+
     opener = urllib2.build_opener(NoRedirect())
 
-    req = urllib2.Request('http://tiddlyspace.com' + path)
+    req = urllib2.Request(target_server + path)
 
     if auth_token:
         req.add_header('Cookie', 'tiddlyweb_user=%s' % auth_token)
@@ -71,9 +74,12 @@ def handle_write(environ, start_response, method, auth_token):
     return content
 
 
-def handle_get(environ, start_response, auth_token):
-    path = environ['PATH_INFO']
+def handle_get(environ, start_response, config):
 
+    auth_token = config.get('auth_token')
+    target_server = config.get('target_server')
+
+    path = environ['PATH_INFO']
     path = path.lstrip('/')
     path_parts = path.split('/')
 
@@ -91,7 +97,7 @@ def handle_get(environ, start_response, auth_token):
             mime_type = mimetypes.guess_type(local_path)[0]
         except IOError:
             try:
-                filehandle = at_server(path, auth_token)
+                filehandle = at_server(target_server, path, auth_token)
                 mime_type = filehandle.info().gettype()
             except IOError, exc:
                 code = exc.getcode()
@@ -105,10 +111,11 @@ def handle_get(environ, start_response, auth_token):
 def in_assets(path):
     return open(os.path.join('.', 'assets', path))
 
-def at_server(path, auth_token):
+
+def at_server(server, path, auth_token):
     if not path.startswith('/'):
         path = '/%s' % path
-    req = urllib2.Request('http://tiddlyspace.com' + path)
+    req = urllib2.Request(server + path)
     if auth_token:
         req.add_header('Cookie', 'tiddlyweb_user=%s' % auth_token)
     return urllib2.urlopen(req)
