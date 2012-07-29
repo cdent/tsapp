@@ -2,17 +2,13 @@
 WSGI app that provides a proxy to tiddlyspace as needed.
 """
 
+from __future__ import absolute_import
+
 import os
 import mimetypes
 import urllib2
 
-
-class NoRedirect(urllib2.HTTPRedirectHandler):
-    """
-    Handler for urllib2 that avoids following redirects.
-    """
-    def redirect_request(self, req, fproxy, code, msg, hdrs, newurl):
-        pass
+from .http import http_write
 
 
 def create_app(auth_token=None):
@@ -44,29 +40,17 @@ def handle_write(environ, start_response, method, config):
     Handle a POST, PUT or DELETE.
     """
     path = environ['PATH_INFO']
-    content_length = environ['CONTENT_LENGTH']
+    content_length = int(environ['CONTENT_LENGTH'])
+    content_type = environ['CONTENT_TYPE']
 
     auth_token = config.get('auth_token')
     target_server = config.get('target_server')
 
-    opener = urllib2.build_opener(NoRedirect())
-
-    req = urllib2.Request(target_server + path)
-
-    if auth_token:
-        req.add_header('Cookie', 'tiddlyweb_user=%s' % auth_token)
-
+    uri = target_server + path
     try:
-        req.add_header('Content-Type', environ['CONTENT-TYPE'])
-    except KeyError:
-        pass
-
-    req.get_method = lambda: method
-    req.add_data(environ['wsgi.input'].read(int(content_length)))
-
-    try:
-        response = opener.open(req)
-        mime_type = response.info().gettype()
+        response, mime_type = http_write(method=method, uri=uri,
+                auth_token=auth_token, filehandle=environ['wsgi.input'],
+                count=content_length, mime_type=content_type)
     except IOError, exc:
         code = exc.getcode()
         start_response(str(code) + ' error', [])

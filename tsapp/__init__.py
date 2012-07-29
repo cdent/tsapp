@@ -109,6 +109,25 @@ def new_app(args):
         sys.exit(1)
 
 
+def push(args):
+    """
+    Push the assets to the target server, into target_bag.
+    """
+    from .push import push_assets
+
+    config = read_config()
+    auth_token = config.get('auth_token')
+    
+    target_server = config.get('target_server')
+    target_bag = args[0]
+    
+    try:
+        push_assets(target_server, target_bag, auth_token)
+    except Exception, exc:
+        sys.stderr.write('%s\n' % exc)
+        sys.exit(1)
+
+
 def show_help(args):
     """
     Display this help.
@@ -118,9 +137,10 @@ def show_help(args):
 
 
 COMMANDS = {
-    'serve': run_server,
+    'help': show_help,
     'init': new_app,
-    'help': show_help
+    'push': push,
+    'serve': run_server,
 }
 
 
