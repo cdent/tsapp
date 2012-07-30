@@ -24,7 +24,7 @@ def push_assets(server, bag, auth_token):
             target_name = target_name.rsplit('.', 1)[0]
         if '/' in target_name:
             target_name = target_name.split('/')[-1]
-        target_path = '/bags/%s_public/tiddlers/%s' % (urllib2.quote(bag),
+        target_path = '/bags/%s/tiddlers/%s' % (urllib2.quote(bag),
                 urllib2.quote(target_name))
 
         uri = server + target_path
