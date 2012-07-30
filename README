@@ -130,7 +130,8 @@ Set it with the `auth` command or copy in the tiddlyweb_user cookie.
 Examples
 ========
 
-`TBC`
+* http://tsapp.tiddlyspace.com/ provides a simple docs interface,
+  created with `tsapp`.
 
 Acknowledgements
 ================
