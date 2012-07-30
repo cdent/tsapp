@@ -36,6 +36,7 @@ def write_config(new_data):
         existing_data = {}
     existing_data.update(new_data)
 
+    def_umask = os.umask(0077)
     config_file = open('./.tsapp', 'w')
 
     for key, value in existing_data.iteritems():
@@ -44,6 +45,7 @@ def write_config(new_data):
         config_file.write('%s:%s\n' % (key, value))
 
     config_file.close()
+    os.umask(def_umask)
 
 
 def read_config():
