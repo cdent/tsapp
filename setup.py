@@ -8,10 +8,10 @@ setup(
     description = 'Manage an app for TiddlySpace.',
     author = 'Chris Dent',
     author_email = 'cdent@peermore.com',
+    url = 'http://pypi.python.org/pypi/tsapp',
     platforms = 'Posix; MacOS X; Windows',
     scripts = ['tsapp'],
     packages = find_packages(exclude=['test']),
-    install_requires = ['requests'],
     include_package_data = True,
     zip_safe = False
     )

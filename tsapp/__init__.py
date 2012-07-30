@@ -10,6 +10,9 @@ import os
 import sys
 
 
+__version__ = '0.1.0'
+
+
 def error_exit(code, message=""):
     """
     Exit with code and provided message.
