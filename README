@@ -82,6 +82,14 @@ auth
 Authenticate to the target_server as username and write the resulting
 auth token to the local directory's configuration file.
 
+delete
+------
+
+`tsapp delete <bag name> <tiddler title>`
+
+A convenience method for removing a tiddler that's ended up on the
+server that is no longer needed and may be in the way.
+
 Configuration
 =============
 

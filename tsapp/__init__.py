@@ -193,6 +193,25 @@ def push(args):
         sys.exit(1)
 
 
+def delete(args):
+    """
+    Delete a single tiddler from the server at the named bag.
+
+    tsapp delete bag_name tiddler_title
+    """
+    from .delete import delete_tiddler
+
+    bag_name = args[0]
+    tiddler_title = args[1]
+    config = read_config()
+
+    try:
+        delete_tiddler(config, bag_name, tiddler_title)
+    except Exception, exc:
+        sys.stderr.write('%s\n' % exc)
+        sys.exit(1)
+
+
 def show_help(args):
     """
     Display this help.
@@ -207,6 +226,7 @@ COMMANDS = {
     'push': push,
     'serve': run_server,
     'auth': do_auth,
+    'delete': delete,
 }
 
 

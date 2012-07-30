@@ -47,7 +47,7 @@ def http_write(method='PUT', uri=None, auth_token=None, filehandle=None,
         req.add_data(filehandle.read(count))
     elif filehandle:
         req.add_data(filehandle.read())
-    else:
+    elif data:
         data = urllib.urlencode(data)
         req.add_data(data)
 
