@@ -31,7 +31,7 @@ Commands
 
 `tsapp` provides a single script that takes multiple commands. Running 
 `tsapp help` will list the relevant commands. The following lists 
-available commands. Those command which are not yet completed are marked
+available commands. Those commands which are not yet completed are marked
 with `TBC`.
 
 init
@@ -72,7 +72,7 @@ bag named by `<bag name>`. If the bag does not end with `_private` or
 `_public`, then `_public` will be appended.
 
 Files that have a `.html` or `.tid` extension on the source file will
-have the extension removed on the target. `.tid` support is `TBC`.
+have the extension removed on the target.
 
 auth
 ----
