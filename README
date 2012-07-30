@@ -14,7 +14,7 @@ Install
 =======
 
 _This part is not yet true as the code has not been released to pypi yet.
-In the meantime clone the repo to access the files.__
+In the meantime clone the repo to access the files._
 
 tsapp is a Python 2 based tool. You will need a Python installation (2.5
 and above). `pip` is used for installation. If you don't have pip you can

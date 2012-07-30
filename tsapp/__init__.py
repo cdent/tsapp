@@ -4,6 +4,7 @@ Basic starting point for tsapp commands.
 
 from __future__ import absolute_import
 
+import getpass
 import glob
 import os
 import sys
@@ -16,6 +17,30 @@ def error_exit(code, message=""):
     if message:
         sys.stderr.write("%s\n" % message)
     sys.exit(code)
+
+
+def write_config(new_data):
+    """
+    Update the local .tsapp file with the provided new_data
+    merged in.
+
+    Note that this will remove any comments and change the
+    order of the keys.
+    """
+    try:
+        existing_data = _read_config('.')
+    except IOError:
+        existing_data = {}
+    existing_data.update(new_data)
+
+    config_file = open('./.tsapp', 'w')
+
+    for key, value in existing_data.iteritems():
+        key = key.strip()
+        value = value.strip()
+        config_file.write('%s:%s\n' % (key, value))
+
+    config_file.close()
 
 
 def read_config():
@@ -38,15 +63,26 @@ def read_config():
         paths.insert(0, homedir)
     for path in paths:
         try:
-            config_file = open(os.path.join(path, '.tsapp'))
-            for line in config_file.readlines():
-                key, value = line.split(':', 1)
-                key = key.rstrip().lstrip()
-                value = value.rstrip().lstrip()
-                if key and value and not key.startswith('#'):
-                    config[key] = value
+            new_data = _read_config(path)
+            config.update(new_data)
         except IOError:
             pass
+    return config
+
+
+def _read_config(path):
+    """
+    Do the actual reading of one single config file.
+    Return a dict of the contained info.
+    """
+    config = {}
+    config_file = open(os.path.join(path, '.tsapp'))
+    for line in config_file.readlines():
+        key, value = line.split(':', 1)
+        key = key.strip()
+        value = value.strip()
+        if key and value and not key.startswith('#'):
+            config[key] = value
     return config
 
 
@@ -85,6 +121,28 @@ def run_server(args):
         httpd.serve_forever()
     except KeyboardInterrupt:
         sys.exit(0)
+
+
+def do_auth(args):
+    """
+    Authenticate the provided user against the target_server
+    by putting them through the appropriate challenger.
+    """
+    from .auth import authenticate
+
+    config = read_config()
+    user = args[0]
+    password = getpass.getpass(prompt='Password: ')
+
+    auth_data = None
+
+    try:
+        auth_data = authenticate(config, user, password)
+    except Exception, exc:
+        sys.stderr.write('%s\n' % exc)
+        sys.exit(1)
+
+    write_config({'auth_token': auth_data})
 
 
 def new_app(args):
@@ -145,6 +203,7 @@ COMMANDS = {
     'init': new_app,
     'push': push,
     'serve': run_server,
+    'auth': do_auth,
 }
 
 
@@ -157,7 +216,7 @@ def handle(args):
         functor = COMMANDS[command]
         functor(args)
     except IndexError, exc:
-        error_exit(1, 'command required')
+        error_exit(1, 'command or arg required')
     except KeyError, exc:
         error_exit(1, 'command unknown: %s' % exc)
     # let others raise themselves, for now

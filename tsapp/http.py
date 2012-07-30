@@ -4,6 +4,7 @@ HTTP fundamentals.
 
 import mimetypes
 import urllib2
+import urllib
 
 
 class NoRedirect(urllib2.HTTPRedirectHandler):
@@ -15,11 +16,12 @@ class NoRedirect(urllib2.HTTPRedirectHandler):
 
 
 def http_write(method='PUT', uri=None, auth_token=None, filehandle=None,
-        filename=None, mime_type=None, count=None):
+        filename=None, mime_type=None, data=None, count=None):
     """
-    Do an HTTP write method.
+    Do an HTTP write method. As you can see from the method
+    signature this is attempting to generalize a lot of different
+    ways of being called. Which is dumb, but it is working for now.
     """
-    print 'uri', uri
     opener = urllib2.build_opener(NoRedirect())
 
     if filename:
@@ -39,8 +41,11 @@ def http_write(method='PUT', uri=None, auth_token=None, filehandle=None,
     req.get_method = lambda: method
     if count:
         req.add_data(filehandle.read(count))
-    else:
+    elif filehandle:
         req.add_data(filehandle.read())
+    else:
+        data = urllib.urlencode(data)
+        req.add_data(data)
 
     response = opener.open(req)
     mime_type = response.info().gettype()
