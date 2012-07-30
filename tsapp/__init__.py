@@ -117,10 +117,14 @@ def push(args):
 
     config = read_config()
     auth_token = config.get('auth_token')
-    
+
     target_server = config.get('target_server')
     target_bag = args[0]
-    
+
+    if not (target_bag.endswith('_public')
+            or target_bag.endswith('_private')):
+        target_bag = '%s_public' % target_bag
+
     try:
         push_assets(target_server, target_bag, auth_token)
     except Exception, exc:

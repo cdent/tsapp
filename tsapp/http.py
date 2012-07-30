@@ -45,4 +45,3 @@ def http_write(method='PUT', uri=None, auth_token=None, filehandle=None,
     response = opener.open(req)
     mime_type = response.info().gettype()
     return response, mime_type
-

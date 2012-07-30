@@ -9,7 +9,13 @@ import urllib2
 
 from .http import http_write
 
+
 def push_assets(server, bag, auth_token):
+    """
+    Push *.html in the local dir and everything in assets
+    to server, into the named bag, using the provided
+    auth_token (if any).
+    """
     sources = glob.glob('*.html') + glob.glob('assets/*')
 
     for path in sources:
