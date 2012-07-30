@@ -77,12 +77,10 @@ have the extension removed on the target. `.tid` support is `TBC`.
 auth
 ----
 
-`TBC`
-
 `tsapp auth <username>`
 
 Authenticate to the target_server as username and write the resulting
-auth token to the local directories configuration file.
+auth token to the local directory's configuration file.
 
 Configuration
 =============
