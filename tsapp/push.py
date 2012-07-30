@@ -20,7 +20,7 @@ def push_assets(server, bag, auth_token):
 
     for path in sources:
         target_name = path
-        if target_name.endswith('.html'):
+        if target_name.endswith('.html') or target_name.endswith('.tid'):
             target_name = target_name.rsplit('.', 1)[0]
         if '/' in target_name:
             target_name = target_name.split('/')[-1]

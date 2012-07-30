@@ -10,7 +10,7 @@ setup(
     author_email = 'cdent@peermore.com',
     url = 'http://pypi.python.org/pypi/tsapp',
     platforms = 'Posix; MacOS X; Windows',
-    scripts = ['tsapp'],
+    scripts = ['script/tsapp'],
     packages = find_packages(exclude=['test']),
     include_package_data = True,
     zip_safe = False

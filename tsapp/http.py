@@ -7,6 +7,10 @@ import urllib2
 import urllib
 
 
+mimetypes.add_type('text/plain', '.tid')
+mimetypes.add_type('woff', '.application/x-woff')
+
+
 class NoRedirect(urllib2.HTTPRedirectHandler):
     """
     Handler for urllib2 that avoids following redirects.
