@@ -98,7 +98,12 @@ and in the current directory. `$HOME/.tsapp` overrides defaults and
 `./.tsapp` overrides `$HOME/.tsapp`. There is no requirement for a configuration
 file in the home directory if one is not desired. However, in order
 for the `push` command to work, a `.tsapp` containing an `auth_token` must
-be found. The `auth` command will create one. The fields are:
+be found. The `auth` command will create one.
+
+Make sure that you do _not_ commit a .tsapp file that includes the
+auth_token.
+
+The fields are:
 
 target_server
 -------------
