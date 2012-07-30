@@ -96,7 +96,7 @@ Configuration
 tsapp looks for a `.tsapp` configuration file in the current user's `$HOME`
 and in the current directory. `$HOME/.tsapp` overrides defaults and 
 `./.tsapp` overrides `$HOME/.tsapp`. There is no requirement for a configuration
-file in the the home directory if one is not desired. However, in order
+file in the home directory if one is not desired. However, in order
 for the `push` command to work, a `.tsapp` containing an `auth_token` must
 be found. The `auth` command will create one. The fields are:
 
