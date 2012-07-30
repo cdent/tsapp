@@ -2,7 +2,7 @@
 Summary
 =======
 
-tsapp provides a tool, `tsapp` for creating browser-based applications
+tsapp provides a tool, `tsapp`, for creating browser-based applications
 for use with [TiddlySpace](http://tiddlyspace.com/). Such applications are
 made of one or more html files along with one or more CSS and JavaScript
 files for presenting and access the tiddler data that lives in TiddlySpace.
@@ -12,9 +12,6 @@ that need a persistent but simple data store with a clean, robust API.
 
 Install
 =======
-
-_This part is not yet true as the code has not been released to pypi yet.
-In the meantime clone the repo to access the files._
 
 tsapp is a Python 2 based tool. You will need a Python installation (2.5
 and above). `pip` is used for installation. If you don't have pip you can
