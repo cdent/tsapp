@@ -1,0 +1,79 @@
+
+Summary
+=======
+
+ink: Summary
+
+Install
+=======
+
+ink: Install
+
+Commands
+========
+
+ink: Commands
+
+init
+----
+
+ink: init
+
+serve
+-----
+
+ink: serve
+
+push
+----
+
+ink: push
+
+auth
+----
+
+ink: auth
+
+delete
+------
+
+ink: delete
+
+Configuration
+=============
+
+ink: Configuration
+
+The fields are:
+
+target_server
+-------------
+
+ink: target_server
+
+local_host
+----------
+
+ink: local_host
+
+port
+----
+
+ink: port
+
+auth_token
+----------
+
+ink: auth_token
+
+Examples
+========
+
+* http://tsapp.tiddlyspace.com/ provides a simple docs interface,
+  created with `tsapp`.
+
+Acknowledgements
+================
+
+Thanks to @bengillies for his `tsupload` script which provided some of the
+motivation for creating this.
