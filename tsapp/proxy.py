@@ -40,13 +40,16 @@ def handle_write(environ, start_response, method, config):
     Handle a POST, PUT or DELETE.
     """
     path = environ['PATH_INFO']
+    query_string = environ.get('QUERY_STRING')
     content_length = int(environ['CONTENT_LENGTH'])
     content_type = environ['CONTENT_TYPE']
 
     auth_token = config.get('auth_token')
     target_server = config.get('target_server')
 
-    uri = target_server + path
+    uri = target_server + path 
+    if query_string:
+        uri = uri + '?' + query_string
     try:
         response, mime_type = http_write(method=method, uri=uri,
                 auth_token=auth_token, filehandle=environ['wsgi.input'],
@@ -71,6 +74,7 @@ def handle_get(environ, start_response, config):
     auth_token = config.get('auth_token')
     target_server = config.get('target_server')
 
+    query_string = environ.get('QUERY_STRING')
     path = environ['PATH_INFO']
     path = path.lstrip('/')
     path_parts = path.split('/')
@@ -89,6 +93,8 @@ def handle_get(environ, start_response, config):
             mime_type = mimetypes.guess_type(local_path)[0]
         except IOError:
             try:
+                if query_string:
+                    path = path + '?' + query_string
                 filehandle = at_server(target_server, path, auth_token)
                 mime_type = filehandle.info().gettype()
             except IOError, exc:
