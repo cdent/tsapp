@@ -85,8 +85,12 @@ def handle_get(environ, start_response, config):
 
     try:
         if len(path_parts) == 1:
-            filehandle = open(path)
-            mime_type = mimetypes.guess_type(path)[0]
+            try:
+                filehandle = open(path)
+                mime_type = mimetypes.guess_type(path)[0]
+            except IOError:
+                filehandle = in_assets(path)
+                mime_type = mimetypes.guess_type(path)[0]
         else:
             local_path = path_parts[-1]
             filehandle = in_assets(local_path)
