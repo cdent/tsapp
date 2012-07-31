@@ -189,8 +189,7 @@ def push(args):
     except IndexError:
         tiddler = None
 
-    if not (target_bag.endswith('_public')
-            or target_bag.endswith('_private')):
+    if not '_' in target_bag:
         target_bag = '%s_public' % target_bag
 
     try:
