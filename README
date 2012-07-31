@@ -31,6 +31,9 @@ Commands
 available commands. Those commands which are not yet completed are marked
 with `TBC`.
 
+Note that the commands are designed to allow easy creation of aliases and
+to otherwise be combined in a useful fashion using the shell.
+
 init
 ----
 
@@ -62,7 +65,7 @@ to change when pushed to the target server for eventual hosting.
 push
 ----
 
-`tsapp push <bag name>`
+`tsapp push <bag name> [<tiddler title>]`
 
 Push (via HTTP `PUT`) all the local assets to the target server, in the
 bag named by `<bag name>`. If the bag does not end with `_private` or
@@ -70,6 +73,8 @@ bag named by `<bag name>`. If the bag does not end with `_private` or
 
 Files that have a `.html` or `.tid` extension on the source file will
 have the extension removed on the target.
+
+If `<tiddler title>` is provided, just that one tiddler will be pushed.
 
 auth
 ----

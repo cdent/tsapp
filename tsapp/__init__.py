@@ -174,7 +174,7 @@ def new_app(args):
 
 def push(args):
     """
-    Push the assets to the target server, into target_bag.
+    Push the assets or single tiddler to the target server, into target_bag.
     """
     from .push import push_assets
 
@@ -184,12 +184,17 @@ def push(args):
     target_server = config.get('target_server')
     target_bag = args[0]
 
+    try:
+        tiddler = args[1]
+    except IndexError:
+        tiddler = None
+
     if not (target_bag.endswith('_public')
             or target_bag.endswith('_private')):
         target_bag = '%s_public' % target_bag
 
     try:
-        push_assets(target_server, target_bag, auth_token)
+        push_assets(target_server, target_bag, auth_token, tiddler=tiddler)
     except Exception, exc:
         sys.stderr.write('%s\n' % exc)
         sys.exit(1)
