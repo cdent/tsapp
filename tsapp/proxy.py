@@ -75,32 +75,36 @@ def handle_get(environ, start_response, config):
     target_server = config.get('target_server')
 
     query_string = environ.get('QUERY_STRING')
+
     path = environ['PATH_INFO']
     path = path.lstrip('/')
     path_parts = path.split('/')
 
-    if len(path_parts) == 1:
-        try:
+    control_view = environ.get('HTTP_X_CONTROLVIEW')
+    accept = environ.get('HTTP_ACCEPT')
+
+    try:
+        if len(path_parts) == 1:
             filehandle = open(path)
             mime_type = mimetypes.guess_type(path)[0]
-        except IOError:
-            start_response('404 Not Found', [])
-            return []
-    else:
-        local_path = path_parts[-1]
-        try:
+        else:
+            local_path = path_parts[-1]
             filehandle = in_assets(local_path)
             mime_type = mimetypes.guess_type(local_path)[0]
-        except IOError:
+    except IOError:
+        try:
+            if query_string:
+                path = path + '?' + query_string
+            filehandle = at_server(target_server, path, accept,
+                    auth_token, control_view)
+            mime_type = filehandle.info().gettype()
+        except IOError, exc:
             try:
-                if query_string:
-                    path = path + '?' + query_string
-                filehandle = at_server(target_server, path, auth_token)
-                mime_type = filehandle.info().gettype()
-            except IOError, exc:
                 code = exc.getcode()
-                start_response(str(code) + ' error', [])
-                return []
+            except AttributeError:
+                raise exc
+            start_response(str(code) + ' error', [])
+            return []
 
     start_response('200 OK', [('Content-Type', mime_type)])
     return filehandle
@@ -115,13 +119,17 @@ def in_assets(path):
     return open(os.path.join('.', 'assets', path))
 
 
-def at_server(server, path, auth_token):
+def at_server(server, path, accept, auth_token, control_view):
     """
     Filehandle for the resource at the target server.
     """
     if not path.startswith('/'):
         path = '/%s' % path
     req = urllib2.Request(server + path)
+    if accept:
+        req.add_header('Accept', accept)
     if auth_token:
         req.add_header('Cookie', 'tiddlyweb_user=%s' % auth_token)
+    if control_view:
+        req.add_header('X-ControlView', 'false')
     return urllib2.urlopen(req)

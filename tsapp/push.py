@@ -17,7 +17,7 @@ def push_assets(server, bag, auth_token, tiddler=None):
     auth_token (if any).
     """
     if tiddler:
-        sources = ['assets/%s' % tiddler]
+        sources = glob.glob('assets/%s' % tiddler) + glob.glob(tiddler)
     else:
         sources = glob.glob('*.html') + glob.glob('assets/*')
 
