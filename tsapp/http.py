@@ -32,7 +32,7 @@ def http_write(method='PUT', uri=None, auth_token=None, filehandle=None,
         filehandle = open(filename)
         mime_type = mimetypes.guess_type(filename)[0]
 
-    req = urllib2.Request(uri)
+    req = urllib2.Request(uri.encode('utf-8'))
 
     if auth_token:
         req.add_header('Cookie', 'tiddlyweb_user=%s' % auth_token)
