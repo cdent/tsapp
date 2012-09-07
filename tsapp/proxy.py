@@ -7,6 +7,8 @@ from __future__ import absolute_import
 import os
 import mimetypes
 import urllib2
+import uuid
+from re import sub
 
 from .http import http_write
 
@@ -35,11 +37,39 @@ class App(object):
             return handle_get(environ, start_response, self.config)
 
 
+def path_info_fixer(path):
+    """
+    So, like so many other web servers, wsgiref simple server 
+    chooses to unquote PATH_INFO before setting it in the 
+    WSGI environ. This means the path `/foo/bar%2fbaz%20zoom` 
+    becomes `/foo/bar/bar zoom` which is now impossible to
+    return to its original form or to extract the correct, um,
+    path info from.
+
+    We can work around this in a known set of URIs, like tiddlyweb's
+    api. Everywhere we expect a /, turn it into a uuid. All
+    the other slashes turn back into %2F, then turn the uuid back
+    into /. 
+
+    This is probably more complicated than it needs to be but
+    I lost my brain somewhere along the way. I can't believe this
+    sort of stuff still goes on in HTTP servers. Don't mess
+    with the %2F!!!
+    """
+    token = str(uuid.uuid4())
+    path = sub('^/', token, path, count=1)
+    path = sub('(bags|recipes|tiddlers|revisions)/', '\g<1>' + token, path)
+    path = sub('/(tiddlers|revisions)', token + '\g<1>', path)
+    path = sub('/', '%2f', path)
+    path = sub(token, '/', path)
+    return path
+
+
 def handle_write(environ, start_response, method, config):
     """
     Handle a POST, PUT or DELETE.
     """
-    path = environ['PATH_INFO']
+    path = path_info_fixer(urllib2.quote(environ['PATH_INFO']))
     query_string = environ.get('QUERY_STRING')
     content_length = int(environ['CONTENT_LENGTH'])
     content_type = environ['CONTENT_TYPE']
@@ -97,6 +127,7 @@ def handle_get(environ, start_response, config):
             mime_type = mimetypes.guess_type(local_path)[0]
     except IOError:
         try:
+            path = path_info_fixer(urllib2.quote(path))
             if query_string:
                 path = path + '?' + query_string
             filehandle = at_server(target_server, path, accept,
