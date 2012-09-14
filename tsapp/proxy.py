@@ -71,8 +71,18 @@ def handle_write(environ, start_response, method, config):
     """
     path = path_info_fixer(urllib2.quote(environ['PATH_INFO']))
     query_string = environ.get('QUERY_STRING')
-    content_length = int(environ['CONTENT_LENGTH'])
+    try:
+        content_length = int(environ['CONTENT_LENGTH'])
+        filehandle = environ['wsgi.input']
+    except (KeyError, ValueError):
+        content_length = None
+        filehandle = None
     content_type = environ['CONTENT_TYPE']
+
+    # ensure we don't try to read the input socket on a DELETE
+    if method == 'DELETE':
+        content_length = None
+        filehandle = None
 
     auth_token = config.get('auth_token')
     target_server = config.get('target_server')
@@ -82,7 +92,7 @@ def handle_write(environ, start_response, method, config):
         uri = uri + '?' + query_string
     try:
         response, mime_type = http_write(method=method, uri=uri,
-                auth_token=auth_token, filehandle=environ['wsgi.input'],
+                auth_token=auth_token, filehandle=filehandle,
                 count=content_length, mime_type=content_type)
     except IOError, exc:
         code = exc.getcode()
