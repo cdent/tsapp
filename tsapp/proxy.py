@@ -139,7 +139,7 @@ def handle_get(environ, start_response, config):
             except AttributeError:
                 raise exc
             start_response(str(code) + ' error', [])
-            return []
+            return ['%s' % exc]
 
     start_response('200 OK', [('Content-Type', mime_type)])
     return filehandle
