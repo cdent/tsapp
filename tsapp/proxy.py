@@ -13,6 +13,9 @@ from re import sub
 from .http import http_write
 
 
+mimetypes.add_type('text/cache-manifest', '.appcache')
+
+
 def create_app(auth_token=None):
     """
     Return the app, configured with proper auth token.
