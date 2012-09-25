@@ -8,6 +8,7 @@ import Cookie
 
 from .http import http_write
 
+
 def authenticate(config, user, password):
     """
     Authenticate the user with password against target_server,

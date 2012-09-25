@@ -42,9 +42,9 @@ class App(object):
 
 def path_info_fixer(path):
     """
-    So, like so many other web servers, wsgiref simple server 
-    chooses to unquote PATH_INFO before setting it in the 
-    WSGI environ. This means the path `/foo/bar%2fbaz%20zoom` 
+    So, like so many other web servers, wsgiref simple server
+    chooses to unquote PATH_INFO before setting it in the
+    WSGI environ. This means the path `/foo/bar%2fbaz%20zoom`
     becomes `/foo/bar/bar zoom` which is now impossible to
     return to its original form or to extract the correct, um,
     path info from.
@@ -52,7 +52,7 @@ def path_info_fixer(path):
     We can work around this in a known set of URIs, like tiddlyweb's
     api. Everywhere we expect a /, turn it into a uuid. All
     the other slashes turn back into %2F, then turn the uuid back
-    into /. 
+    into /.
 
     This is probably more complicated than it needs to be but
     I lost my brain somewhere along the way. I can't believe this
@@ -90,7 +90,7 @@ def handle_write(environ, start_response, method, config):
     auth_token = config.get('auth_token')
     target_server = config.get('target_server')
 
-    uri = target_server + path 
+    uri = target_server + path
     if query_string:
         uri = uri + '?' + query_string
     try:

@@ -6,6 +6,7 @@ from urllib import quote
 
 from .http import http_write
 
+
 def delete_tiddler(config, bag_name, tiddler_title):
     """
     Delete the tiddler named by tiddler_title from bag_name
