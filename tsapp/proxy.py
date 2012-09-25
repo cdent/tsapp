@@ -134,10 +134,12 @@ def handle_get(environ, start_response, config):
             except IOError:
                 filehandle = in_assets(path)
                 mime_type = mimetypes.guess_type(path)[0]
-        else:
+        elif len(path_parts) == 4:
             local_path = path_parts[-1]
             filehandle = in_assets(local_path)
             mime_type = mimetypes.guess_type(local_path)[0]
+        else:
+            raise IOError('path wrong length')
     except IOError:
         try:
             path = path_info_fixer(urllib2.quote(path))
