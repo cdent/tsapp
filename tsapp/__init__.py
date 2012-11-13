@@ -36,10 +36,17 @@ def write_config(new_data):
         existing_data = {}
     existing_data.update(new_data)
 
+    _write_config(existing_data)
+
+
+def _write_config(data):
+    """
+    Do the actual writing of one single config file.
+    """
     def_umask = os.umask(0077)
     config_file = open('./.tsapp', 'w')
 
-    for key, value in existing_data.iteritems():
+    for key, value in data.iteritems():
         key = key.strip()
         value = value.strip()
         config_file.write('%s:%s\n' % (key, value))
@@ -89,6 +96,19 @@ def _read_config(path):
         if key and value and not key.startswith('#'):
             config[key] = value
     return config
+
+
+def delete_config_property(key):
+    """
+    Remove a line of config identified by it's key.
+    """
+    try:
+        existing_data = _read_config('.')
+    except IOError:
+        existing_data = {}
+    existing_data.pop(key)
+
+    _write_config(existing_data)
 
 
 def run_server(args):

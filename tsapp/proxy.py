@@ -6,12 +6,15 @@ from __future__ import absolute_import
 
 import os
 import mimetypes
+import sys
 import urllib2
 import uuid
 from re import sub
 
 from .http import http_write
 
+from tsapp import write_config, read_config, delete_config_property
+from tsapp.auth import authenticate
 
 mimetypes.add_type('text/cache-manifest', '.appcache')
 
@@ -33,6 +36,8 @@ class App(object):
         self.config = config
 
     def __call__(self, environ, start_response):
+        # Always re-read the config as the auth token may be written/removed during a login/logout request.
+        self.config = read_config()
         method = environ['REQUEST_METHOD'].upper()
         if method != 'GET':
             return handle_write(environ, start_response, method, self.config)
@@ -90,6 +95,30 @@ def handle_write(environ, start_response, method, config):
     auth_token = config.get('auth_token')
     target_server = config.get('target_server')
 
+    # Intercept any login attempts and use the authenticate method if no auth token is present
+    if path == '/challenge%2ftiddlywebplugins.tiddlyspace.cookie_form':
+        if auth_token is None:
+            form_data = environ['wsgi.input'].read(int(content_length)).split('&')
+            user = form_data[0].split('=')[1]
+            password = form_data[1].split('=')[1]
+            try:
+                auth_data = authenticate(config, user, password)
+            except Exception, exc:
+                sys.stderr.write('%s\n' % exc)
+                sys.exit(1)
+            write_config({'auth_token': auth_data})
+
+        start_response('204 OK', [('Content-type', 'text/plain')])
+        return []
+
+    # Intercept any logout attempts and remove the auth_token
+    if path == '/logout':
+        if auth_token is not None:
+            delete_config_property('auth_token')
+
+        start_response('204 OK', [('Content-type', 'text/plain')])
+        return []
+
     uri = target_server + path
     if query_string:
         uri = uri + '?' + query_string
@@ -113,7 +142,6 @@ def handle_get(environ, start_response, config):
     dir. If not there try at the target server, at the path
     requested.
     """
-
     auth_token = config.get('auth_token')
     target_server = config.get('target_server')
 
