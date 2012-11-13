@@ -6,12 +6,15 @@ from __future__ import absolute_import
 
 import os
 import mimetypes
+import sys
 import urllib2
 import uuid
 from re import sub
 
 from .http import http_write
 
+from tsapp import write_config, read_config
+from tsapp.auth import authenticate
 
 mimetypes.add_type('text/cache-manifest', '.appcache')
 
@@ -33,6 +36,8 @@ class App(object):
         self.config = config
 
     def __call__(self, environ, start_response):
+        # Always re-read the config as the auth token may be written during a login request.
+        self.config = read_config()
         method = environ['REQUEST_METHOD'].upper()
         if method != 'GET':
             return handle_write(environ, start_response, method, self.config)
@@ -87,6 +92,21 @@ def handle_write(environ, start_response, method, config):
         content_length = None
         filehandle = None
 
+
+    # Intercept any login attempts and use the authenticate method
+    if path == '/challenge%2ftiddlywebplugins.tiddlyspace.cookie_form':
+        form_data = environ['wsgi.input'].read(int(content_length)).split('&')
+        user = form_data[0].split('=')[1]
+        password = form_data[1].split('=')[1]
+        try:
+            auth_data = authenticate(config, user, password)
+        except Exception, exc:
+            sys.stderr.write('%s\n' % exc)
+            sys.exit(1)
+        write_config({'auth_token': auth_data})
+        start_response('204 OK', [('Content-type', 'text/plain')])
+        return []
+
     auth_token = config.get('auth_token')
     target_server = config.get('target_server')
 
@@ -113,7 +133,6 @@ def handle_get(environ, start_response, config):
     dir. If not there try at the target server, at the path
     requested.
     """
-
     auth_token = config.get('auth_token')
     target_server = config.get('target_server')
 
