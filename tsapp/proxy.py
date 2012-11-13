@@ -105,7 +105,12 @@ def handle_write(environ, start_response, method, config):
                 auth_data = authenticate(config, user, password)
             except Exception, exc:
                 sys.stderr.write('%s\n' % exc)
+                status = exc.getcode()
+                if status == 401:
+                    start_response('401 Unauthorized', [('Content-type', 'text/plain')])
+                    return []
                 sys.exit(1)
+
             write_config({'auth_token': auth_data})
 
         start_response('204 OK', [('Content-type', 'text/plain')])
