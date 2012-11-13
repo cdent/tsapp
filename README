@@ -127,14 +127,11 @@ auth_token
 ----------
 
 Auth secret for accessing private resources on the target server. No default.
-Set it with the `auth` command or copy in the tiddlyweb_user cookie.
+Set it with the `auth` command or copy in the `tiddlyweb_user` cookie.
 
-The auth_token property will also be set (only if it does not exist already)
-when the server intercepts login requests to
-`/challenge/tiddlywebplugins.tiddlyspace.cookie_form`
+The auth_token property will also be set (only if it does not exist already) when the server intercepts login requests to `/challenge/tiddlywebplugins.tiddlyspace.cookie_form`
 
-If a POST to `/logout` is made and the auth_token exists, it will be removed
-from the configuration.
+If a POST to `/logout` is made and the auth_token exists, it will be removed from the configuration.
 
 Examples
 ========
