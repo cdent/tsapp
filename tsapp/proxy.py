@@ -113,7 +113,8 @@ def handle_write(environ, start_response, method, config):
 
     # Intercept any logout attempts and remove the auth_token
     if path == '/logout':
-        delete_config_property('auth_token')
+        if auth_token is not None:
+            delete_config_property('auth_token')
 
         start_response('204 OK', [('Content-type', 'text/plain')])
         return []
