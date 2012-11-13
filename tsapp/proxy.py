@@ -92,23 +92,24 @@ def handle_write(environ, start_response, method, config):
         content_length = None
         filehandle = None
 
-
-    # Intercept any login attempts and use the authenticate method
-    if path == '/challenge%2ftiddlywebplugins.tiddlyspace.cookie_form':
-        form_data = environ['wsgi.input'].read(int(content_length)).split('&')
-        user = form_data[0].split('=')[1]
-        password = form_data[1].split('=')[1]
-        try:
-            auth_data = authenticate(config, user, password)
-        except Exception, exc:
-            sys.stderr.write('%s\n' % exc)
-            sys.exit(1)
-        write_config({'auth_token': auth_data})
-        start_response('204 OK', [('Content-type', 'text/plain')])
-        return []
-
     auth_token = config.get('auth_token')
     target_server = config.get('target_server')
+
+    # Intercept any login attempts and use the authenticate method if no auth token is present
+    if path == '/challenge%2ftiddlywebplugins.tiddlyspace.cookie_form':
+        if auth_token is None:
+            form_data = environ['wsgi.input'].read(int(content_length)).split('&')
+            user = form_data[0].split('=')[1]
+            password = form_data[1].split('=')[1]
+            try:
+                auth_data = authenticate(config, user, password)
+            except Exception, exc:
+                sys.stderr.write('%s\n' % exc)
+                sys.exit(1)
+            write_config({'auth_token': auth_data})
+
+        start_response('204 OK', [('Content-type', 'text/plain')])
+        return []
 
     uri = target_server + path
     if query_string:
