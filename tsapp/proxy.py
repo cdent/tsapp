@@ -13,7 +13,7 @@ from re import sub
 
 from .http import http_write
 
-from tsapp import write_config, read_config
+from tsapp import write_config, read_config, delete_config_property
 from tsapp.auth import authenticate
 
 mimetypes.add_type('text/cache-manifest', '.appcache')
@@ -36,7 +36,7 @@ class App(object):
         self.config = config
 
     def __call__(self, environ, start_response):
-        # Always re-read the config as the auth token may be written during a login request.
+        # Always re-read the config as the auth token may be written/removed during a login/logout request.
         self.config = read_config()
         method = environ['REQUEST_METHOD'].upper()
         if method != 'GET':
@@ -107,6 +107,13 @@ def handle_write(environ, start_response, method, config):
                 sys.stderr.write('%s\n' % exc)
                 sys.exit(1)
             write_config({'auth_token': auth_data})
+
+        start_response('204 OK', [('Content-type', 'text/plain')])
+        return []
+
+    # Intercept any logout attempts and remove the auth_token
+    if path == '/logout':
+        delete_config_property('auth_token')
 
         start_response('204 OK', [('Content-type', 'text/plain')])
         return []
