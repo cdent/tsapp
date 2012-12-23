@@ -159,6 +159,8 @@ def handle_get(environ, start_response, config):
     control_view = environ.get('HTTP_X_CONTROLVIEW')
     accept = environ.get('HTTP_ACCEPT')
 
+    headers = []
+
     try:
         if len(path_parts) == 1:
             try:
@@ -181,6 +183,8 @@ def handle_get(environ, start_response, config):
             filehandle = at_server(target_server, path, accept,
                     auth_token, control_view)
             mime_type = filehandle.info().gettype()
+            if 'etag' in filehandle.info():
+                headers.append(('ETag', filehandle.info()['etag']))
         except IOError, exc:
             try:
                 code = exc.getcode()
@@ -189,7 +193,8 @@ def handle_get(environ, start_response, config):
             start_response(str(code) + ' error', [])
             return ['%s' % exc]
 
-    start_response('200 OK', [('Content-Type', mime_type)])
+    headers.append(('Content-Type', mime_type))
+    start_response('200 OK', headers)
     return filehandle
 
 
