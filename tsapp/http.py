@@ -3,6 +3,7 @@ HTTP fundamentals.
 """
 
 import mimetypes
+import sys
 import urllib2
 import urllib
 
@@ -51,6 +52,11 @@ def http_write(method='PUT', uri=None, auth_token=None, filehandle=None,
         data = urllib.urlencode(data)
         req.add_data(data)
 
-    response = opener.open(req)
+    try:
+        response = opener.open(req)
+    except urllib2.HTTPError, exc:
+        sys.stderr.write('%s response for %s %s\n' % (exc, method, uri))
+        return None, None
+
     mime_type = response.info().gettype()
     return response, mime_type
