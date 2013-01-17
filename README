@@ -76,6 +76,19 @@ have the extension removed on the target.
 
 If `<tiddler title>` is provided, just that one tiddler will be pushed.
 
+push_hard
+---------
+
+`tsapp push_hard <bag name> [<tiddler title>]`
+
+Push (via HTTP `PUT`) all the local assets to the target server, in the bag named by `<bag name>`. If the bag does not end with `_private` or `_public`, then `_public` will be appended.
+
+This command is distinct from `push` in that the target file on the server is deleted before the `PUT`.
+
+Files that have a `.html` or `.tid` extension on the source file will have the extension removed on the target.
+
+If `<tiddler title>` is provided, just that one tiddler will be pushed.
+
 auth
 ----
 

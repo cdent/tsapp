@@ -29,6 +29,11 @@ push
 
 ink: push
 
+push_hard
+---------
+
+ink: push_hard
+
 auth
 ----
 
