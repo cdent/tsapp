@@ -196,6 +196,21 @@ def push(args):
     """
     Push the assets or single tiddler to the target server, into target_bag.
     """
+    _push(args, hard=False)
+
+
+def push_hard(args):
+    """
+    Push the assets or single tiddler to the target server, into target_bag,
+    deleting the assets first.
+    """
+    _push(args, hard=True)
+
+
+def _push(args, hard=False):
+    """
+    Do the actual pushing.
+    """
     from .push import push_assets
 
     config = read_config()
@@ -213,7 +228,8 @@ def push(args):
         target_bag = '%s_public' % target_bag
 
     try:
-        push_assets(target_server, target_bag, auth_token, tiddler=tiddler)
+        push_assets(target_server, target_bag, auth_token,
+                tiddler=tiddler, hard=hard)
     except Exception, exc:
         sys.stderr.write('%s\n' % exc)
         sys.exit(1)
@@ -250,6 +266,7 @@ COMMANDS = {
     'help': show_help,
     'init': new_app,
     'push': push,
+    'push_hard': push_hard,
     'serve': run_server,
     'auth': do_auth,
     'delete': delete,

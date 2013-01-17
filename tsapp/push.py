@@ -10,11 +10,11 @@ import urllib2
 from .http import http_write
 
 
-def push_assets(server, bag, auth_token, tiddler=None):
+def push_assets(server, bag, auth_token, tiddler=None, hard=False):
     """
     Push *.html in the local dir and everything in assets
     to server, into the named bag, using the provided
-    auth_token (if any).
+    auth_token (if any). If hard is True, delete the assets first.
     """
     if tiddler:
         sources = glob.glob('assets/%s' % tiddler) + glob.glob(tiddler)
@@ -32,5 +32,8 @@ def push_assets(server, bag, auth_token, tiddler=None):
 
         uri = server + target_path
 
+        if hard:
+            http_write(method='DELETE', uri=uri, auth_token=auth_token,
+                    filename=path)
         http_write(method='PUT', uri=uri, auth_token=auth_token,
                 filename=path)
