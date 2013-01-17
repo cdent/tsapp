@@ -9,7 +9,7 @@ import urllib
 
 
 mimetypes.add_type('text/plain', '.tid')
-mimetypes.add_type('woff', '.application/x-woff')
+mimetypes.add_type('application/x-woff', '.woff')
 
 
 class NoRedirect(urllib2.HTTPRedirectHandler):
@@ -29,19 +29,21 @@ def http_write(method='PUT', uri=None, auth_token=None, filehandle=None,
     """
     opener = urllib2.build_opener(NoRedirect())
 
-    if filename:
+    if filename and method is not 'DELETE':
         filehandle = open(filename)
         mime_type = mimetypes.guess_type(filename)[0]
+        if not mime_type:
+            sys.stderr.write('Unable to guess mime type for %s, skipping!\n'
+                    % filename)
+            return None, None
 
     req = urllib2.Request(uri.encode('utf-8'))
 
     if auth_token:
         req.add_header('Cookie', 'tiddlyweb_user=%s' % auth_token)
 
-    try:
+    if method is not 'DELETE':
         req.add_header('Content-Type', mime_type)
-    except KeyError:
-        pass
 
     req.get_method = lambda: method
     if count:
@@ -55,7 +57,7 @@ def http_write(method='PUT', uri=None, auth_token=None, filehandle=None,
     try:
         response = opener.open(req)
     except urllib2.HTTPError, exc:
-        sys.stderr.write('%s response for %s %s\n' % (exc, method, uri))
+        sys.stderr.write('WARN: %s response for %s %s\n' % (exc, method, uri))
         return None, None
 
     mime_type = response.info().gettype()
