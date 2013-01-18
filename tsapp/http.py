@@ -10,6 +10,9 @@ import urllib
 
 mimetypes.add_type('text/plain', '.tid')
 mimetypes.add_type('application/x-woff', '.woff')
+mimetypes.add_type('application/octet-stream', '.ttf')
+mimetypes.add_type('application/vnd.ms-fontobject', '.eot')
+mimetypes.add_type('image/svg+xml', '.svg')
 
 
 class NoRedirect(urllib2.HTTPRedirectHandler):
@@ -31,7 +34,7 @@ def http_write(method='PUT', uri=None, auth_token=None, filehandle=None,
 
     if filename and method is not 'DELETE':
         filehandle = open(filename)
-        mime_type = mimetypes.guess_type(filename)[0]
+        mime_type = mimetypes.guess_type(filename, strict=False)[0]
         if not mime_type:
             sys.stderr.write('Unable to guess mime type for %s, skipping!\n'
                     % filename)
