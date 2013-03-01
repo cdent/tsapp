@@ -67,7 +67,7 @@ def path_info_fixer(path):
     token = str(uuid.uuid4())
     path = sub('^/', token, path, count=1)
     path = sub('(users|spaces|bags|recipes|tiddlers|revisions)/', '\g<1>' + token, path)
-    path = sub('/(tiddlers|revisions)', token + '\g<1>', path)
+    path = sub('/(tiddlers|revisions|members)', token + '\g<1>', path)
     path = sub('/', '%2f', path)
     path = sub(token, '/', path)
     return path
