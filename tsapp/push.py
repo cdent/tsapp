@@ -33,7 +33,16 @@ def push_assets(server, bag, auth_token, tiddler=None, hard=False):
         uri = server + target_path
 
         if hard:
-            http_write(method='DELETE', uri=uri, auth_token=auth_token,
-                    filename=path)
+            # delete the tiddler, but if it is not there, don't
+            # worry
+            try:
+                http_write(method='DELETE', uri=uri, auth_token=auth_token,
+                        filename=path)
+            except urllib2.HTTPError, exc:
+                status = exc.getcode()
+                if status == 404:
+                    pass
+                else:
+                    raise
         http_write(method='PUT', uri=uri, auth_token=auth_token,
                 filename=path)

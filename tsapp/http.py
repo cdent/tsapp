@@ -57,11 +57,9 @@ def http_write(method='PUT', uri=None, auth_token=None, filehandle=None,
         data = urllib.urlencode(data)
         req.add_data(data)
 
-    try:
-        response = opener.open(req)
-    except urllib2.HTTPError, exc:
-        sys.stderr.write('WARN: %s response for %s %s\n' % (exc, method, uri))
-        return None, None
+    # a non 20x response on this will raise an exception expected
+    # to be handled by the caller
+    response = opener.open(req)
 
     mime_type = response.info().gettype()
     return response, mime_type
