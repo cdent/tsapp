@@ -66,7 +66,7 @@ def path_info_fixer(path):
     """
     token = str(uuid.uuid4())
     path = sub('^/', token, path, count=1)
-    path = sub('(bags|recipes|tiddlers|revisions)/', '\g<1>' + token, path)
+    path = sub('(users|spaces|bags|recipes|tiddlers|revisions)/', '\g<1>' + token, path)
     path = sub('/(tiddlers|revisions)', token + '\g<1>', path)
     path = sub('/', '%2f', path)
     path = sub(token, '/', path)
@@ -175,6 +175,7 @@ def handle_get(environ, start_response, config):
             mime_type = mimetypes.guess_type(local_path)[0]
         else:
             raise IOError('path wrong length')
+        status = '200 OK'
     except IOError:
         try:
             path = path_info_fixer(urllib2.quote(path))
@@ -183,6 +184,8 @@ def handle_get(environ, start_response, config):
             filehandle = at_server(target_server, path, accept,
                     auth_token, control_view)
             mime_type = filehandle.info().gettype()
+            # we would prefer text here, not just the code
+            status = '%s ' % filehandle.getcode()
             if 'etag' in filehandle.info():
                 headers.append(('ETag', filehandle.info()['etag']))
         except IOError, exc:
@@ -194,7 +197,7 @@ def handle_get(environ, start_response, config):
             return ['%s' % exc]
 
     headers.append(('Content-Type', mime_type))
-    start_response('200 OK', headers)
+    start_response(status, headers)
     return filehandle
 
 
