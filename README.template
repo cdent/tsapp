@@ -71,6 +71,11 @@ auth_token
 
 ink: auth_token
 
+wsgi_sever
+----------
+
+ink: wsgi_server
+
 Examples
 ========
 

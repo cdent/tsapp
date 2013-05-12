@@ -125,27 +125,25 @@ def run_server(args):
 
     GET is handled locally and proxied. Other methods (write)
     only proxy.
+
+    If "wsgi_server" is set in config the value is taken as a module
+    containing a function "start_server" which, when passed the config
+    will start a server.
     """
     config = read_config()
-
-    from wsgiref.simple_server import make_server
-    from .proxy import create_app
 
     port = int(config['port'])
     local_host = config['local_host']
 
-    httpd = make_server(local_host, port, create_app(config))
-
     uri = 'http://%s:%s/' % (local_host, port)
 
-    print 'Serving %s' % uri
+    print 'Starting server at %s' % uri
     for html in glob.glob('*.html'):
         print 'Try: %s%s' % (uri, html)
 
-    try:
-        httpd.serve_forever()
-    except KeyboardInterrupt:
-        sys.exit(0)
+    server_module = config.get('wsgi_server', 'tsapp.server')
+    imported_module = __import__(server_module, {}, {}, ['start_server'])
+    imported_module.start_server(config)
 
 
 def do_auth(args):
