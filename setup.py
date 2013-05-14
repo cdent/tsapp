@@ -12,6 +12,7 @@ setup(
     platforms = 'Posix; MacOS X; Windows',
     scripts = ['script/tsapp'],
     packages = find_packages(exclude=['test']),
+    install_requires = ['cherrypy'],
     include_package_data = True,
     zip_safe = False
     )

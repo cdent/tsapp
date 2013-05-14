@@ -7,6 +7,7 @@ from __future__ import absolute_import
 import os
 import mimetypes
 import sys
+import time
 import urllib2
 import uuid
 from re import sub
@@ -19,11 +20,78 @@ from tsapp.auth import authenticate
 mimetypes.add_type('text/cache-manifest', '.appcache')
 
 
-def create_app(auth_token=None):
+def create_app(config):
     """
     Return the app, configured with proper auth token.
     """
-    return App(auth_token)
+    return Log(App(config))
+
+class Log(object):
+    """
+    Write a simple log to STDOUT. Based on SimpleLog from TiddlyWeb,
+    which is itself based on Translogger from Paste.
+    """
+
+    format = ('%(REMOTE_ADDR)s - %(REMOTE_USER)s [%(time)s] '
+            '"%(REQUEST_METHOD)s %(REQUEST_URI)s %(HTTP_VERSION)s" '
+            '%(status)s %(bytes)s "%(HTTP_REFERER)s" "%(HTTP_USER_AGENT)s"')
+
+    def __init__(self, application):
+        self.application = application
+
+    def __call__(self, environ, start_response):
+        return self._log_app(environ, start_response)
+
+    def _log_app(self, environ, start_response):
+        req_uri = urllib2.quote(environ.get('SCRIPT_NAME', '')
+                + environ.get('PATH_INFO', ''))
+        if environ.get('QUERY_STRING'):
+            req_uri += '?' + environ['QUERY_STRING']
+
+        def replacement_start_response(status, headers, exc_info=None):
+            """
+            We need to gaze at the content-length, if set, to
+            write log info.
+            """
+            size = None
+            for name, value in headers:
+                if name.lower() == 'content-length':
+                    size = value
+            self.write_log(environ, req_uri, status, size)
+            return start_response(status, headers, exc_info)
+
+        return self.application(environ, replacement_start_response)
+
+    def write_log(self, environ, req_uri, status, size):
+        """
+        Print the log info out in a formatted form.
+
+        This is rather more complex than desirable because there is
+        a mix of str and unicode in the gathered data and we need to
+        make it acceptable for output.
+        """
+        environ['REMOTE_USER'] = '-'
+        if size is None:
+            size = '-'
+        log_format = {
+                'REMOTE_ADDR': environ.get('REMOTE_ADDR') or '-',
+                'REMOTE_USER': environ.get('REMOTE_USER') or '-',
+                'REQUEST_METHOD': environ['REQUEST_METHOD'],
+                'REQUEST_URI': req_uri,
+                'HTTP_VERSION': environ.get('SERVER_PROTOCOL'),
+                'time': time.strftime('%d/%b/%Y:%H:%M:%S ', time.localtime()),
+                'status': status.split(None, 1)[0],
+                'bytes': size,
+                'HTTP_REFERER': environ.get('HTTP_REFERER', '-'),
+                'HTTP_USER_AGENT': environ.get('HTTP_USER_AGENT', '-'),
+        }
+        for key, value in log_format.items():
+            try:
+                log_format[key] = value.encode('utf-8', 'replace')
+            except UnicodeDecodeError:
+                log_format[key] = value
+        message = self.format % log_format
+        print message
 
 
 class App(object):

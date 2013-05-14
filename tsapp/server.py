@@ -5,7 +5,8 @@ Start a web server to host the proxy.
 import sys
 
 from .proxy import create_app
-from wsgiref.simple_server import make_server
+from cherrypy.wsgiserver import CherryPyWSGIServer
+
 
 def start_server(config):
     """
@@ -14,9 +15,10 @@ def start_server(config):
     port = int(config['port'])
     local_host = config['local_host']
 
-    httpd = make_server(local_host, port, create_app(config))
+    server = CherryPyWSGIServer((local_host, port), create_app(config))
 
     try:
-        httpd.serve_forever()
+        server.start()
     except KeyboardInterrupt:
+        server.stop()
         sys.exit(0)
