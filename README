@@ -159,7 +159,12 @@ from the configuration in the local directory.
 wsgi_sever
 ----------
 
-The name of a python module containing a `start_server` method which, when passed `config`, will start a web server hosting the proxy application. By default this is a built in `wsgiref` sever but it can be any `WSGI` server. See [a simple cherrypy example](https://gist.github.com/cdent/5564147).
+The name of a python module containing a `start_server` method which,
+when passed `config`, will start a web server hosting the proxy
+application. Originally this was the server provided by the `wsgiref`
+module in the Python stdlib, but this proved to be annoyingly slow.
+Now `CherryPyWSGIServer` is used. An example of using the original
+server [is availble](https://gist.github.com/cdent/5564147).
 
 Examples
 ========
