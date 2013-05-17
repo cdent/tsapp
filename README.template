@@ -81,6 +81,11 @@ tiddlyweb_mode
 
 ink: tiddlyweb_mode
 
+server_prefix
+-------------
+
+ink: server_prefix
+
 Examples
 ========
 

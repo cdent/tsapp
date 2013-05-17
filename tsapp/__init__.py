@@ -216,6 +216,7 @@ def _push(args, hard=False):
 
     target_server = config.get('target_server')
     tiddlyweb_mode = config.get('tiddlyweb_mode')
+    server_prefix = config.get('server_prefix')
     target_bag = args[0]
 
     try:
@@ -228,7 +229,7 @@ def _push(args, hard=False):
 
     try:
         push_assets(target_server, target_bag, auth_token,
-                tiddler=tiddler, hard=hard)
+                tiddler=tiddler, hard=hard, server_prefix=server_prefix)
     except Exception, exc:
         sys.stderr.write('%s\n' % exc)
         sys.exit(1)

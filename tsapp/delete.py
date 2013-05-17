@@ -14,8 +14,12 @@ def delete_tiddler(config, bag_name, tiddler_title):
     """
 
     target_server = config['target_server']
+    server_prefix = config.get('server_prefix')
     auth_token = config.get('auth_token')
-    uri = '%s/bags/%s/tiddlers/%s' % (target_server, quote(bag_name, safe=''),
+    uri = 'bags/%s/tiddlers/%s' % (quote(bag_name, safe=''),
             quote(tiddler_title, safe=''))
+    if server_prefix:
+        uri = '%s/%s' % (server_prefix, uri)
+    uri = '%s/%s' % (target_server, uri)
 
     http_write(method='DELETE', uri=uri, auth_token=auth_token)
