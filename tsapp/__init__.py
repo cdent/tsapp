@@ -215,6 +215,7 @@ def _push(args, hard=False):
     auth_token = config.get('auth_token')
 
     target_server = config.get('target_server')
+    tiddlyweb_mode = config.get('tiddlyweb_mode')
     target_bag = args[0]
 
     try:
@@ -222,7 +223,7 @@ def _push(args, hard=False):
     except IndexError:
         tiddler = None
 
-    if not '_' in target_bag:
+    if not '_' in target_bag and not(tiddlyweb_mode):
         target_bag = '%s_public' % target_bag
 
     try:
