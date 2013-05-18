@@ -73,8 +73,8 @@ push
 
 Push (via HTTP `PUT`) all the local assets to the target server, in the
 bag named by `<bag name>`. If the bag does not end with `_private` or
-`_public`, then `_public` will be appended.  The exception to this is if
-`tiddlyweb_mode` is set (see Configuration below).
+`_public`, then `_public` will be appended. The exception to this is if
+`tiddlyweb_mode` is set to True in config.
 
 Files that have a `.html` or `.tid` extension on the source file will
 have the extension removed on the target.
@@ -88,8 +88,8 @@ push_hard
 
 Push (via HTTP `PUT`) all the local assets to the target server, in the
 bag named by `<bag name>`. If the bag does not end with `_private` or
-`_public`, then `_public` will be appended.  The exception to this is if
-`tiddlyweb_mode` is set (see Configuration below).
+`_public`, then `_public` will be appended. The exception to this is if
+`tiddlyweb_mode` is set to True in config.
 
 This command is distinct from `push` in that the target file on the
 server is deleted before the `PUT`.
