@@ -18,11 +18,16 @@ def authenticate(config, user, password):
     post_data = dict(user=user, password=password)
     target = config['target_server']
     tiddlyweb_mode = config.get('tiddlyweb_mode')
+    server_prefix = config.get('server_prefix')
+    uri = target
+
+    if server_prefix:
+        uri = target + '/' + server_prefix
 
     if tiddlyweb_mode:
-        uri = target + '/challenge/cookie_form'
+        uri = uri + '/challenge/cookie_form'
     else:
-        uri = target + '/challenge/tiddlywebplugins.tiddlyspace.cookie_form'
+        uri = uri + '/challenge/tiddlywebplugins.tiddlyspace.cookie_form'
     # This will always error
     try:
         response, mime_type = http_write(method='POST',

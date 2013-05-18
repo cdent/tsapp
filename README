@@ -182,8 +182,8 @@ server_prefix
 
 A URL prefix (without any `/`)
 prepended to `/bags/<somebag>/tiddlers/<sometiddler>` that is used when
-looking up, pushing and deleting assets.  This is limited to just a single
-segment e.g. the prefix `web` would complete the path as:
+authenticating, looking up, pushing and deleting assets.  This is limited
+to just a single segment e.g. the prefix `web` would complete the path as:
 `/web/bags/<somebag>/tiddlers/<sometiddler>`
 
 Examples
