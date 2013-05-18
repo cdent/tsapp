@@ -217,6 +217,7 @@ def handle_get(environ, start_response, config):
     """
     auth_token = config.get('auth_token')
     target_server = config.get('target_server')
+    server_prefix = config.get('server_prefix')
 
     query_string = environ.get('QUERY_STRING')
 
@@ -237,7 +238,7 @@ def handle_get(environ, start_response, config):
             except IOError:
                 filehandle = in_assets(path)
                 mime_type = mimetypes.guess_type(path)[0]
-        elif len(path_parts) == 4:
+        elif len(path_parts) == 4 or path_parts[0] == server_prefix:
             local_path = path_parts[-1]
             filehandle = in_assets(local_path)
             mime_type = mimetypes.guess_type(local_path)[0]
