@@ -242,6 +242,9 @@ def handle_get(environ, start_response, config):
             local_path = path_parts[-1]
             filehandle = in_assets(local_path)
             mime_type = mimetypes.guess_type(local_path)[0]
+            # Fall back to JSON if we cannot guess
+            if not mime_type:
+                mime_type = 'application/json'
         else:
             raise IOError('path wrong length')
         status = '200 OK'
